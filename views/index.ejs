@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src='http://code.jquery.com/jquery-2.1.4.min.js'></script>
+  <script src="https://cdn.rawgit.com/smart-on-fhir/client-js/v0.1.8/dist/fhir-client.js"></script>
+
+  <script>
+   var demo = {
+        serviceUrl: 'https://open-ic.epic.com/FHIR/api/FHIR/DSTU2',
+        patientId: "Tbt3KuCY0B5PSrJvCu2j-PlK.aiHsu2xUjUM8bWpetXoB",
+        auth: {          type: 'none'
+        }
+      };
+
+      var smart = FHIR.client(demo);
+      
+      // Create a patient welcome banner 
+      var pq = smart.patient.read();
+
+      pq.then(function(p) {
+        var name = p.name[0];
+        $('#patient_name').text(name.given.join(" ") + " " + name.family.join(" "));
+      });
+
+      var conditions = smart.patient.api.search({type: 'Condition'});
+      conditions.then(function(c) { 
+         c.data.entry.forEach(function(re) { 
+           var row=$("<li>" + re.resource.code.coding[0].display + "</li>");
+           $("#conditions").append(row);
+         });
+      });
+
+</script>
+
+</head>
+
+<body">
+
+ <span id="patient_name">Patient Name</span>
+ <ul id="conditions"></ul>
+</body>
+
+</html>
